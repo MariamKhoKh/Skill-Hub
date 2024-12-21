@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %} teacher profile {% endblock %}
+
+   {% block content %}
+ {% include 'components/sidebar.html' %}
+    <div class="container py-5">
+        <div class="row">
+            {% include 'components/teacher_info.html' %}
+            <a href="{% url 'teacher_profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+            <div class="col-lg-8">
+                    {% include 'components/booking.html' %}
+                    {% include 'components/review.html' %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

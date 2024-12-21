@@ -1,0 +1,26 @@
+{% load static %}
+<html lang="en">
+<head>
+    {% include 'links/style.html' %}
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+  {% include 'components/spinner.html' %}
+
+
+    <div class="content">
+
+    {% include 'components/navbar.html' %}
+        {% block content %}
+        <!-- Main content goes here -->
+        {% endblock %}
+
+
+    </div>
+    {% include 'components/footer.html' %}
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+    {% include 'links/js.html' %}
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!--booking form start-->
+
+<div class="booking-form mb-4">
+    <h4 class="text-light mb-4">Book a Session</h4>
+    <form>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Select Date and Time</label>
+                <div class="input-group date" id="datetimePicker" data-target-input="nearest">
+                    <input type="text" class="form-control bg-dark text-light datetimepicker-input"
+                           data-target="#datetimePicker"/>
+                    <div class="input-group-append" data-target="#datetimePicker" data-toggle="datetimepicker">
+                        <div class="input-group-text bg-dark text-light"><i class="fa fa-calendar"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Duration (hours)</label>
+                <input type="number" class="form-control bg-dark text-light" min="1" max="4" value="1">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Topic</label>
+            <input type="text" class="form-control bg-dark text-light">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Book Now</button>
+    </form>
+</div>
+<!--booking form end-->
+

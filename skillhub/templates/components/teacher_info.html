@@ -1,0 +1,29 @@
+<!-- teaching/teacher_info.html -->
+<div class="text-center mb-4">
+    {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" class="rounded-circle mb-3" alt="Profile Picture">
+    {% endif %}
+    <h3 class="text-light">{{ user.get_full_name }}</h3>
+</div>
+
+<div class="mb-3">
+    <h5 class="text-light">Skills</h5>
+    <div class="d-flex flex-wrap">
+        {% for skill in skills %}
+        <span class="skill-badge">{{ skill }}</span>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="mb-3">
+    <h5 class="text-light">Details</h5>
+    <p><i class="fas fa-clock me-2"></i>Experience: {{ teacher_profile.experience_years }} years</p>
+    <p><i class="fas fa-video me-2"></i>Dialogue: {{ communication_methods|join:", " }}</p>
+    <p><i class="fas fa-calendar-alt me-2"></i>Join Date: {{ teacher_profile.join_date|date:"M Y" }}</p>
+    <p><i class="fas fa-dollar-sign me-2"></i>Hour Rate: ${{ teacher_profile.hourly_rate }}</p>
+</div>
+
+<div class="mb-3">
+    <h5 class="text-light">Bio</h5>
+    <p>{{ user.bio }}</p>
+</div>

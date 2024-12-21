@@ -1,0 +1,34 @@
+<!-- Upcoming Classes -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary text-center rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h6 class="mb-0">Upcoming Classes</h6>
+            <a href="">Show All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                <thead>
+                    <tr class="text-white">
+                        <th scope="col">Time</th>
+                        <th scope="col">Course</th>
+                        <th scope="col">Adress</th>
+                        <th scope="col">Teacher</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for class in upcoming_classes %}
+                    <tr>
+                        <td>{{ class.time|date:"h:i A" }}</td>
+                        <td>{{ class.course.name }}</td>
+                        <td>{{ class.address }}</td>
+                        <td>{{ class.teacher.name }}</td>
+                        <td><a class="btn btn-sm btn-primary" href="">Start Class</a></td>
+                    </tr>
+                   {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+   <!-- upcoming classes end -->

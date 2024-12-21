@@ -1,0 +1,36 @@
+<div class="profile-section">
+    <div class="text-center mb-4">
+        <img src="{{ student.profile_image.url }}" class="rounded-circle mb-3" alt="Student Picture">
+        <h3 class="text-light">{{ student.user.username }}</h3>
+        <p class="text-light">{{ student.grade }} • {{ student.track }}</p>
+    </div>
+
+    <div class="mb-3">
+        <h5 class="text-light">Personal Details</h5>
+        <p><i class="fas fa-graduation-cap me-2"></i>Student ID: {{ student.student_id }}</p>
+        <p><i class="fas fa-calendar-alt me-2"></i>Joined: {{ student.join_date|date:"F Y" }}</p>
+        <p><i class="fas fa-clock me-2"></i>Total Learning Hours: {{ student.total_hours }}</p>
+        <p><i class="fas fa-book me-2"></i>Subjects: {{ student.subject_count }}</p>
+    </div>
+
+    <div class="mb-3">
+        <h5 class="text-light">Learning Goals</h5>
+        {% for goal in student.goals %}
+        <div class="progress-card">
+            <p class="mb-2">{{ goal.name }}</p>
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ goal.progress }}%">{{ goal.progress }}%</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        <h5 class="text-light">Achievements</h5>
+        {% for achievement in student.achievements %}
+        <div class="achievement-badge">
+            <i class="fas fa-star me-1"></i> {{ achievement.name }}
+        </div>
+        {% endfor %}
+    </div>
+</div>

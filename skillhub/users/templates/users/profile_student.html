@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %} student profile {% endblock %}
+
+{% block content %}
+ {% include 'components/sidebar.html' %}
+<div class="container py-5">
+
+    <div class="row">
+        <!-- Personal Info & Statistics -->
+        <div class="col-lg-4">
+            {% include 'components/student_info.html' %}
+                        <a href="{% url 'edit_student_profile' %}" class="btn btn-primary mt-3">Edit Profile</a>
+        </div>
+
+        <!-- Progress & Sessions -->
+        <div class="col-lg-8">
+            <!-- Performance Overview -->
+
+
+            <!-- Upcoming Sessions -->
+            {% include 'components/sessions.html' %}
+            {% include 'components/current_courses.html' %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

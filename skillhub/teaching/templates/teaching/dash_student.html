@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}student's page{% endblock %}
+
+
+<div class="container-fluid position-relative d-flex p-0">
+    {% block content %}
+    {% include 'components/sidebar.html' %}
+
+
+    <!-- Teacher Stats -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-secondary rounded d-flex align-items-center p-4">
+                    <i class="fa fa-users fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Total Teachers</p>
+                        <h6 class="mb-0">23</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-secondary rounded d-flex align-items-center p-4">
+                    <i class="fa fa-book fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Active Courses</p>
+                        <h6 class="mb-0">5</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-secondary rounded d-flex align-items-center p-4">
+                    <i class="fa fa-tasks fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Pending Assignments</p>
+                        <h6 class="mb-0">12</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="bg-secondary rounded d-flex align-items-center p-4">
+                    <i class="fa fa-calendar fa-3x text-primary"></i>
+                    <div class="ms-3">
+                        <p class="mb-2">Today's Classes</p>
+                        <h6 class="mb-0">3</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Teacher Stats End -->
+
+    {% include 'components/upcoming_classes.html' %}
+
+    {% include 'components/assignments_status.html' %}
+    {% include 'components/featured_teachers.html' %}
+
+    {% endblock %}
+
+
+</div>
+
+

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-secondary rounded d-flex align-items-center p-4">
+                <i class="fa fa-users fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Total Students</p>
+                    <h6 class="mb-0">{{ total_students }}</h6>
+                </div>
+            </div>
+        </div>
+        <!-- Add more stat cards -->
+    </div>
+</div>
+
+<!-- Upcoming Classes -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary text-center rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h6 class="mb-0">Upcoming Classes</h6>
+            <a href="{% url 'teacher_schedule' %}">Show All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                <thead>
+                    <tr class="text-white">
+                        <th>Time</th>
+                        <th>Course</th>
+                        <th>Room</th>
+                        <th>Students</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for class in upcoming_classes %}
+                    <tr>
+                        <td>{{ class.start_time|time:"H:i A" }}</td>
+                        <td>{{ class.course.name }}</td>
+                        <td>{{ class.room }}</td>
+                        <td>{{ class.enrolled_students.count }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" href="{% url 'start_class' class.id %}">Start Class</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
