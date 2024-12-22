@@ -1,6 +1,13 @@
+{% load static %}
 <div class="profile-section">
     <div class="text-center mb-4">
-        <img width="250" height="250" src="{{ user.profile_picture.url }}" class="rounded-circle mb-3" alt="Student Picture">
+        {% if user.profile_picture %}
+        <img width="250" height="250" src="{{ user.profile_picture.url }}" class="rounded-circle mb-3"
+             alt="Student Picture">
+        {% else %}
+        <img width="250" height="250" src="{% static 'default-profile.png' %}" class="rounded-circle mb-3"
+             alt="Default Picture">
+        {% endif %}
         <h3 class="text-light">{{ user.username }}</h3>
         <p class="text-light">{{ student.grade }} • {{ student.track }}</p>
     </div>
@@ -17,7 +24,9 @@
         <div class="progress-card">
             <p class="mb-2">{{ goal.name }}</p>
             <div class="progress">
-                <div class="progress-bar bg-success" role="progressbar" style="width: {{ goal.progress }}%">{{ goal.progress }}%</div>
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ goal.progress }}%">{{
+                    goal.progress }}%
+                </div>
             </div>
         </div>
 

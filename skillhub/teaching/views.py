@@ -10,6 +10,7 @@ from .filters import TeacherFilterForm
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from .models import TeacherProfile, Review
+from bookings.models import Booking
 
 
 @login_required
@@ -18,8 +19,14 @@ def teacher_dashboard(request):
         messages.error(request, 'Access denied. Teacher privileges required.')
         return redirect('dashboard')
 
-    teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
     teacher_profile = TeacherProfile.objects.get_or_create(user=request.user)[0]
+
+
+    bookings = Booking.objects.filter(
+        teacher=teacher_profile
+    ).order_by('-created_at')
+
+    teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
     teacher_skills = TeacherSkill.objects.filter(teacher_profile=teacher_profile)
     reviews = Review.objects.filter(teacher_profile=teacher_profile)
 
@@ -28,7 +35,8 @@ def teacher_dashboard(request):
         'teacher_skills': teacher_skills,
         'reviews': reviews,
         'featured_teachers': teachers,
-        'total_teachers': teachers.count()
+        'total_teachers': teachers.count(),
+        'bookings': bookings  # Add bookings to context
     }
     return render(request, 'teaching/dash_teacher.html', context)
 
@@ -36,26 +44,22 @@ def teacher_dashboard(request):
 @login_required
 def student_dashboard(request):
     if request.user.role != 'student':
-        messages.error(request, 'Access denied. Seems you are not student')
+        messages.error(request, 'Access denied. Student privileges required.')
         return redirect('dashboard')
 
-    teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
+    # Get student's bookings
+    bookings = Booking.objects.filter(
+        student=request.user
+    ).select_related('teacher__user').order_by('-created_at')
 
-    filter_form = TeacherFilterForm(request.GET)
-    teachers = TeacherProfile.objects.all().select_related('user')
-
-    if filter_form.is_valid():
-        teachers = filter_form.filter_teachers(teachers)
-
-    # Get statistics for the dashboard
-    total_teachers = TeacherProfile.objects.count()
+    # Count pending bookings
+    pending_bookings = bookings.filter(status='PENDING').count()
 
     context = {
-        'form': filter_form,
-        'teachers': teachers,
-        'total_teachers': total_teachers,
-        'featured_teachers': teachers,
-
+        'bookings': bookings,
+        'pending_bookings': pending_bookings,
+        'total_teachers': TeacherProfile.objects.count(),
+        'featured_teachers': TeacherProfile.objects.select_related('user').all()[:4]
     }
     return render(request, 'teaching/dash_student.html', context)
 

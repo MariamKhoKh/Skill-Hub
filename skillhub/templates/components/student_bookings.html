@@ -1,0 +1,62 @@
+<!-- Student Bookings Section -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary rounded h-100 p-4">
+        <h6 class="mb-4">My Booking Requests</h6>
+        <div class="table-responsive">
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">Teacher</th>
+                        <th scope="col">Date & Time</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Topic</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.teacher.user.username }}</td>
+                        <td>{{ booking.date_time|date:"M d, Y H:i" }}</td>
+                        <td>{{ booking.duration }} hour(s)</td>
+                        <td>{{ booking.topic }}</td>
+                        <td>
+                            <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'ACCEPTED' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if booking.status == 'REJECTED' and booking.rejection_reason %}
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal{{ booking.id }}">
+                                View Reason
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% if booking.status == 'REJECTED' %}
+                    <!-- Detail Modal -->
+                    <div class="modal fade" id="detailModal{{ booking.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content bg-secondary">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Rejection Reason</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>{{ booking.rejection_reason }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

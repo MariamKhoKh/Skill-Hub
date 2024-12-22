@@ -2,29 +2,26 @@
 
 <div class="booking-form mb-4">
     <h4 class="text-light mb-4">Book a Session</h4>
-    <form>
+    <form method="POST" action="{% url 'book_session' teacher_profile.id %}">
+        {% csrf_token %}
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Select Date and Time</label>
-                <div class="input-group date" id="datetimePicker" data-target-input="nearest">
-                    <input type="text" class="form-control bg-dark text-light datetimepicker-input"
-                           data-target="#datetimePicker"/>
-                    <div class="input-group-append" data-target="#datetimePicker" data-toggle="datetimepicker">
-                        <div class="input-group-text bg-dark text-light"><i class="fa fa-calendar"></i></div>
-                    </div>
-                </div>
+                <input type="datetime-local" name="date_time" class="form-control bg-dark text-light" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Duration (hours)</label>
-                <input type="number" class="form-control bg-dark text-light" min="1" max="4" value="1">
+                <input type="number" name="duration" class="form-control bg-dark text-light" min="1" max="4" value="1"
+                       required>
             </div>
         </div>
         <div class="mb-3">
             <label class="form-label">Topic</label>
-            <input type="text" class="form-control bg-dark text-light">
+            <input type="text" name="topic" class="form-control bg-dark text-light" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Book Now</button>
     </form>
+
 </div>
 <!--booking form end-->
 

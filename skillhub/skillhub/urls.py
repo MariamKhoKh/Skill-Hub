@@ -24,8 +24,8 @@ urlpatterns = [
     path('api/', include('rest_framework.urls')),
     path('', include('users.urls')),
     path('teaching/', include('teaching.urls')),
+    path('booking/', include('bookings.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# path('teaching/', include('teaching.urls')),
-# path('booking/', include('booking.urls')),
+

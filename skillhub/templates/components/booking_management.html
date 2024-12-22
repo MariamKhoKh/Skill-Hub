@@ -1,0 +1,94 @@
+<!-- Booking Management Section -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-secondary rounded h-100 p-4">
+        <h6 class="mb-4">Booking Requests</h6>
+        <div class="table-responsive">
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">Student</th>
+                        <th scope="col">Date & Time</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Topic</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.student.username }}</td>
+                        <td>{{ booking.date_time|date:"M d, Y H:i" }}</td>
+                        <td>{{ booking.duration }} hour(s)</td>
+                        <td>{{ booking.topic }}</td>
+                        <td>
+                            <span class="badge {% if booking.status == 'PENDING' %}bg-warning{% elif booking.status == 'ACCEPTED' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if booking.status == 'PENDING' %}
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#acceptModal{{ booking.id }}">
+                                Accept
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal{{ booking.id }}">
+                                Reject
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Accept Modal -->
+                    <div class="modal fade" id="acceptModal{{ booking.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content bg-secondary">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Accept Booking</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to accept this booking?
+                                </div>
+                                <div class="modal-footer">
+                                    <form method="POST" action="{% url 'respond_booking' booking.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="status" value="ACCEPTED">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-success">Accept</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reject Modal -->
+                    <div class="modal fade" id="rejectModal{{ booking.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content bg-secondary">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reject Booking</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="{% url 'respond_booking' booking.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <input type="hidden" name="status" value="REJECTED">
+                                        <div class="mb-3">
+                                            <label for="rejection_reason" class="form-label">Reason for rejection</label>
+                                            <textarea class="form-control bg-dark text-light" name="rejection_reason" rows="3" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-danger">Reject</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
