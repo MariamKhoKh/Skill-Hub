@@ -1,0 +1,9 @@
+<h1>Book Lesson: {{ lesson.title }}</h1>
+<p>Teacher: {{ lesson.teacher.user.username }}</p>
+<p>Date: {{ lesson.date }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Book Lesson</button>
+</form>

@@ -1,62 +1,55 @@
-<!-- Featured Teachers Start -->
+<!-- templates/components/featured_teachers.html -->
+{% load static %}
+
 <div class="container-fluid pt-4 px-4">
     <div class="bg-secondary rounded p-4">
-        <h6 class="mb-4">Featured Teachers</h6>
-        <div class="row g-4">
-            {% for teacher in featured_teachers %}
-            <div class="col-sm-6 col-xl-3">
-                <div class="bg-dark rounded p-4 h-100">
-                    <div class="text-center mb-3">
-                        <img class="rounded-circle" src="img/teacher1.jpg" alt="" style="width: 80px; height: 80px;">
-                    </div>
-                    <h5 class="text-center text-primary mb-2">{{ teacher.name }}</h5>
-                    <p class="text-center mb-2">{{ teacher.role }}</p>
-                    <div class="mb-3">
-                        <h6 class="mb-2">Skills:</h6>
-                        {% for skill in teacher.skills %}
-                        <span class="badge bg-primary me-1">{{ skill }}</span>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-2">
-                        <i class="fa fa-clock me-1"></i>
-                        <span>${{ teacher.hourly_rate }}/hour</span>
-                    </div>
-                    <div class="mb-2">
-                        <i class="fa fa-briefcase me-1"></i>
-                        <span>{{ teacher.experience }} years experience</span>
-                    </div>
-                    <button class="btn btn-primary w-100 mt-2">Book Session</button>
-                </div>
-            </div>
-   {% endfor %}
-            <!-- Teacher Card 2 -->
-            <div class="col-sm-6 col-xl-3">
-                <div class="bg-dark rounded p-4 h-100">
-                    <div class="text-center mb-3">
-                        <img class="rounded-circle" src="img/teacher2.jpg" alt="" style="width: 80px; height: 80px;">
-                    </div>
-                    <h5 class="text-center text-primary mb-2">Michael Brown</h5>
-                    <p class="text-center mb-2">Teacher</p>
-                    <div class="mb-3">
-                        <h6 class="mb-2">Skills:</h6>
-                        <span class="badge bg-primary me-1">Data Science</span>
-                        <span class="badge bg-primary me-1">Python</span>
-                        <span class="badge bg-primary">SQL</span>
-                    </div>
-                    <div class="mb-2">
-                        <i class="fa fa-clock me-1"></i>
-                        <span>$55/hour</span>
-                    </div>
-                    <div class="mb-2">
-                        <i class="fa fa-briefcase me-1"></i>
-                        <span>7 years experience</span>
-                    </div>
-                    <button class="btn btn-primary w-100 mt-2">Book Session</button>
-                </div>
-            </div>
+        <h6 class="mb-4">Featured Teachers ({{ total_teachers }})</h6>
 
-            <!-- Add more teacher cards as needed -->
-        </div>
+        {% if featured_teachers %}
+            <div class="row g-4">
+                {% for teacher in featured_teachers %}
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-dark rounded p-4 h-100">
+                            <div class="text-center mb-3">
+                                {% if teacher.profile_image %}
+                                    <img class="rounded-circle" src="{{ teacher.profile_picture.url }}" alt="Teacher Image" style="width: 80px; height: 80px;">
+                                {% else %}
+                                    <img class="rounded-circle" src="{% static 'images/default-profile.jpg' %}" alt="Default" style="width: 80px; height: 80px;">
+                                {% endif %}
+                            </div>
+                            <h5 class="text-center text-primary mb-2">
+                                {{ teacher.user.get_full_name|default:teacher.user.username }}
+                            </h5>
+                            <p class="text-center mb-2">
+                                {{ teacher.bio|default:"No bio available"|truncatewords:10 }}
+                            </p>
+                            <div class="mb-3">
+                                <h6 class="mb-2">Skills:</h6>
+                                {% if teacher.skills.all %}
+                                    {% for skill in teacher.skills.all %}
+                                        <span class="badge bg-primary me-1">{{ skill }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted">No skills listed</span>
+                                {% endif %}
+                            </div>
+                            <div class="mb-2">
+                                <i class="fa fa-clock me-1"></i>
+                                <span>${{ teacher.hourly_rate|default:"Not set" }}/hour</span>
+                            </div>
+                            <div class="mb-2">
+                                <i class="fa fa-briefcase me-1"></i>
+                                <span>{{ teacher.experience_years|default:"0" }} years experience</span>
+                            </div>
+                            <a href="{% url 'teacher_profile' teacher.id %}" class="btn btn-primary w-100 mt-2">View Profile</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No teachers found at this time.
+            </div>
+        {% endif %}
     </div>
 </div>
-<!-- Featured Teachers End -->

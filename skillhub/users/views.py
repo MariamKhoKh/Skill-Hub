@@ -6,6 +6,8 @@ from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from .forms import UserRegistrationForm, UserLoginForm, UserUpdateForm
 from .models import User, Message, Notification
+from teaching.models import TeacherProfile
+from django.db.models import Avg
 
 
 def register(request):
@@ -75,6 +77,11 @@ def profile_student(request):
 
 @login_required
 def profile_teacher(request):
+    teacher = TeacherProfile.objects.get(user=request.user)
+    reviews = teacher.reviews.all().order_by('-created_at')  # Assuming a `Review` model with a `created_at` field
+    avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    review_count = reviews.count()
+
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
@@ -83,7 +90,14 @@ def profile_teacher(request):
             return redirect('profile_teacher')
     else:
         form = UserUpdateForm(instance=request.user)
-    return render(request, 'users/profile_teacher.html', {'form': form})
+        context = {
+            'form': form,
+            'teacher_profile': teacher,
+            'reviews': reviews,
+            'avg_rating': round(avg_rating, 1),
+            'review_count': review_count,
+        }
+    return render(request, 'users/profile_teacher.html', context)
 
 
 def navbar_data(request):

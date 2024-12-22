@@ -6,9 +6,18 @@
     <a href="#" class="sidebar-toggler flex-shrink-0">
         <i class="fa fa-bars"></i>
     </a>
-    <form class="d-none d-md-flex ms-4">
-        <input class="form-control bg-dark border-0" type="search" placeholder="Search">
-    </form>
+ <!-- Search Form -->
+<form class="d-none d-md-flex ms-4" action="{% url 'search_teachers' %}" method="get">
+    <input
+        class="form-control bg-dark border-0"
+        type="search"
+        name="q"
+        placeholder="Search by teacher name or skill..."
+        value="{{ request.GET.q|default:'' }}">
+    <button class="btn btn-primary ms-2" type="submit">
+        <i class="fa fa-search"></i>
+    </button>
+</form>
     <div class="navbar-nav align-items-center ms-auto">
         <div class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">

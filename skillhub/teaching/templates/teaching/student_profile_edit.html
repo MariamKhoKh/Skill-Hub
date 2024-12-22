@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
-{% block title %}Edit Student Profile{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h2>Edit Your Profile</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        {{ user_form.as_p }}
-        <button type="submit" class="btn btn-success">Save Changes</button>
-        <a href="{% url 'profile_student' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h3>Account Details</h3>
+    {{ user_form.as_p }}
+
+    <h3>Student Details</h3>
+    {{ student_form.as_p }}
+
+    <button type="submit" class="btn btn-success">Save Changes</button>
+</form>
+
 {% endblock %}

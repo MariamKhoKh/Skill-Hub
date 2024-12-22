@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Search Results</h1>
+    {% if query %}
+        <p>Results for: <strong>{{ query }}</strong></p>
+    {% endif %}
+    
+    {% if teachers %}
+        <ul class="list-group">
+            {% for teacher in teachers %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>{{ teacher.user.first_name }} {{ teacher.user.last_name }}</h5>
+                        <p class="mb-0">{{ teacher_profile.bio|truncatewords:20 }}</p>
+                        <small>Skills: {{ teacher_profile.skills.all|join:", " }}</small>
+                    </div>
+                    <a href="{% url 'teacher_profile' teacher.id %}" class="btn btn-primary">View Profile</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No results found for your search.</p>
+    {% endif %}
+</div>
+{% endblock %}

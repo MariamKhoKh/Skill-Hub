@@ -5,8 +5,11 @@ from django.contrib import messages
 from .models import TeacherProfile, Skill, TeacherSkill, Review, Student
 from .forms import TeacherProfileForm, TeacherSkillForm, ReviewForm, TeacherSearchForm, StudentUpdateForm, StudentProfileUpdateForm
 from users.models import User
-
 from users.forms import UserUpdateForm
+from .filters import TeacherFilterForm
+from django.shortcuts import get_object_or_404
+from django.db.models import Avg
+from .models import TeacherProfile, Review
 
 
 @login_required
@@ -15,6 +18,7 @@ def teacher_dashboard(request):
         messages.error(request, 'Access denied. Teacher privileges required.')
         return redirect('dashboard')
 
+    teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
     teacher_profile = TeacherProfile.objects.get_or_create(user=request.user)[0]
     teacher_skills = TeacherSkill.objects.filter(teacher_profile=teacher_profile)
     reviews = Review.objects.filter(teacher_profile=teacher_profile)
@@ -23,43 +27,11 @@ def teacher_dashboard(request):
         'teacher_profile': teacher_profile,
         'teacher_skills': teacher_skills,
         'reviews': reviews,
+        'featured_teachers': teachers,
+        'total_teachers': teachers.count()
     }
     return render(request, 'teaching/dash_teacher.html', context)
 
-
-# @login_required
-# def student_dashboard(request):
-#     if request.user.role != 'student':
-#         messages.error(request, 'Access denied. Seems you are not student')
-#         return redirect('dash_student')
-#
-#     form = TeacherSearchForm(request.GET)
-#     teachers = TeacherProfile.objects.all()
-#
-#     if form.is_valid():
-#         search_query = form.cleaned_data.get('search_query')
-#         min_price = form.cleaned_data.get('min_price')
-#         max_price = form.cleaned_data.get('max_price')
-#         min_rating = form.cleaned_data.get('min_rating')
-#
-#         if search_query:
-#             teachers = teachers.filter(
-#                 Q(user__username__icontains=search_query) |
-#                 Q(skills__name__icontains=search_query)
-#             ).distinct()
-#
-#         if min_price is not None:
-#             teachers = teachers.filter(hourly_rate__gte=min_price)
-#         if max_price is not None:
-#             teachers = teachers.filter(hourly_rate__lte=max_price)
-#         if min_rating is not None:
-#             teachers = teachers.filter(rating__gte=min_rating)
-#
-#     context = {
-#         'form': form,
-#         'teachers': teachers,
-#     }
-#     return render(request, 'teaching/dash_student.html', context)
 
 @login_required
 def student_dashboard(request):
@@ -67,65 +39,42 @@ def student_dashboard(request):
         messages.error(request, 'Access denied. Seems you are not student')
         return redirect('dashboard')
 
-    form = TeacherSearchForm(request.GET)
-    teachers = TeacherProfile.objects.all()
+    teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
 
-    if form.is_valid():
-        # Search query filter
-        search_query = form.cleaned_data.get('search_query')
-        if search_query:
-            teachers = teachers.filter(
-                Q(user__username__icontains=search_query) |
-                Q(skills__icontains=search_query) |
-                Q(bio__icontains=search_query)
-            ).distinct()
+    filter_form = TeacherFilterForm(request.GET)
+    teachers = TeacherProfile.objects.all().select_related('user')
 
-        # Experience range filter
-        experience_range = form.cleaned_data.get('experience_range')
-        if experience_range:
-            if experience_range == '1-3':
-                teachers = teachers.filter(experience_years__gte=1, experience_years__lte=3)
-            elif experience_range == '4-6':
-                teachers = teachers.filter(experience_years__gte=4, experience_years__lte=6)
-            elif experience_range == '7+':
-                teachers = teachers.filter(experience_years__gte=7)
+    if filter_form.is_valid():
+        teachers = filter_form.filter_teachers(teachers)
 
-        # Price range filter
-        min_price = form.cleaned_data.get('min_price')
-        max_price = form.cleaned_data.get('max_price')
-        if min_price is not None:
-            teachers = teachers.filter(hourly_rate__gte=min_price)
-        if max_price is not None:
-            teachers = teachers.filter(hourly_rate__lte=max_price)
-
-        # Rating filter
-        min_rating = form.cleaned_data.get('min_rating')
-        if min_rating is not None:
-            teachers = teachers.filter(rating__gte=min_rating)
-
-        # Communication methods filter
-        communication_methods = form.cleaned_data.get('communication_method')
-        if communication_methods:
-            q_objects = Q()
-            for method in communication_methods:
-                q_objects |= Q(communication_methods__icontains=method)
-            teachers = teachers.filter(q_objects)
+    # Get statistics for the dashboard
+    total_teachers = TeacherProfile.objects.count()
 
     context = {
-        'form': form,
+        'form': filter_form,
         'teachers': teachers,
+        'total_teachers': total_teachers,
+        'featured_teachers': teachers,
+
     }
     return render(request, 'teaching/dash_student.html', context)
 
 
-@login_required
 def teacher_profile_view(request, teacher_id):
     teacher_profile = TeacherProfile.objects.get(id=teacher_id)
+    reviews = Review.objects.filter(teacher_profile=teacher_profile).order_by('-created_at')
+
+    avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
+    review_count = reviews.count()
+
     context = {
         'teacher_profile': teacher_profile,
         'user': teacher_profile.user,
-        'skills': teacher_profile.get_skills(),
-        'communication_methods': teacher_profile.communication_methods_list()
+        'skills': teacher_profile.skills,
+        'communication_methods': teacher_profile.communication_methods,
+        'reviews': reviews,
+        'avg_rating': avg_rating,
+        'review_count': review_count,
     }
     return render(request, 'users/profile_teacher.html', context)
 
@@ -155,13 +104,8 @@ def teacher_profile_edit(request):
 
 @login_required
 def edit_student_profile(request):
-    student, created = Student.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'grade': '',
-            'track': '',
-        }
-    )
+    student, created = Student.objects.get_or_create(user=request.user)
+
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         student_form = StudentUpdateForm(request.POST, instance=student)
@@ -175,7 +119,54 @@ def edit_student_profile(request):
         user_form = UserUpdateForm(instance=request.user)
         student_form = StudentUpdateForm(instance=student)
 
-    return render(request, 'users/profile_student.html', {
+    return render(request, 'teaching/student_profile_edit.html', {
         'user_form': user_form,
-        'student_form': student_form
+        'student_form': student_form,
     })
+
+
+def search_teachers(request):
+    query = request.GET.get('q', '').strip()
+    if query:
+        teachers = TeacherProfile.objects.filter(
+            Q(user__username__icontains=query) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(skills__name__icontains=query)
+        ).distinct()
+    else:
+        teachers = TeacherProfile.objects.none()
+
+    return render(request, 'teaching/search_results.html', {'teachers': teachers, 'query': query})
+
+
+def featured_teachers_view(request):
+    try:
+        all_teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
+
+        context = {
+            'featured_teachers': all_teachers,
+            'total_teachers': all_teachers.count()
+        }
+
+        return render(request, 'teaching/dash_teacher.html', context)
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        return render(request, 'teaching/dash_teacher.html', {'featured_teachers': []})
+
+
+def add_review(request, teacher_id):
+    if request.method == 'POST':
+        teacher = get_object_or_404(TeacherProfile, id=teacher_id)
+        rating = int(request.POST.get('rating', 5))
+        comment = request.POST.get('comment', '')
+        Review.objects.create(
+            teacher_profile=teacher,
+            student=request.user,
+            rating=rating,
+            comment=comment
+        )
+        messages.success(request, 'Review added successfully!')
+        return redirect('teacher_profile', teacher_id=teacher.id)
+
+

@@ -8,8 +8,8 @@
             {% include 'components/teacher_info.html' %}
             <a href="{% url 'teacher_profile_edit' %}" class="btn btn-primary">Edit Profile</a>
             <div class="col-lg-8">
-                    {% include 'components/booking.html' %}
-                    {% include 'components/review.html' %}
+                    {% include 'components/booking.html' with profile_teacher=teacher %}
+                    {% include 'components/review.html' with profile_teacher=teacher %}
             </div>
         </div>
     </div>
