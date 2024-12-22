@@ -2,26 +2,70 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Search Results</h1>
     {% if query %}
-        <p>Results for: <strong>{{ query }}</strong></p>
+    <h2 class="mb-4">Results for: "{{ query }}"</h2>
     {% endif %}
-    
+
     {% if teachers %}
-        <ul class="list-group">
-            {% for teacher in teachers %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5>{{ teacher.user.first_name }} {{ teacher.user.last_name }}</h5>
-                        <p class="mb-0">{{ teacher_profile.bio|truncatewords:20 }}</p>
-                        <small>Skills: {{ teacher_profile.skills.all|join:", " }}</small>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for teacher in teachers %}
+        <div class="col">
+            <div class="card h-100">
+                {% if teacher.profile_picture %}
+                    <img src="{{ teacher.profile_picture.url }}" class="card-img-top" alt="{{ teacher.user.get_full_name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-user fa-3x"></i>
                     </div>
-                    <a href="{% url 'teacher_profile' teacher.id %}" class="btn btn-primary">View Profile</a>
-                </li>
-            {% endfor %}
-        </ul>
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ teacher.user.get_full_name }}</h5>
+                    {% if teacher.title %}
+                        <h6 class="card-subtitle mb-2 text-muted">{{ teacher.title }}</h6>
+                    {% endif %}
+
+                    {% if teacher.bio %}
+                        <p class="card-text">{{ teacher.bio|truncatewords:25 }}</p>
+                    {% endif %}
+
+                    {% if teacher.skills.all %}
+                        <div class="mb-2">
+                            <strong>Skills:</strong>
+                            <div class="mt-1">
+                                {% for skill in teacher.skills.all %}
+                                    <span class="badge bg-primary me-1">{{ skill.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if teacher.hourly_rate %}
+                        <p class="card-text">
+                            <strong>Rate:</strong> ${{ teacher.hourly_rate }}/hour
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'teacher_profile' teacher.id %}" class="btn btn-primary">View Profile</a>
+                        {% if teacher.rating %}
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <span>{{ teacher.rating|floatformat:1 }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     {% else %}
-        <p class="text-muted">No results found for your search.</p>
+        <div class="alert alert-info">
+            No results found for your search.
+        </div>
     {% endif %}
 </div>
 {% endblock %}

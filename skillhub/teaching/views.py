@@ -144,6 +144,7 @@ def search_teachers(request):
     return render(request, 'teaching/search_results.html', {'teachers': teachers, 'query': query})
 
 
+
 def featured_teachers_view(request):
     try:
         all_teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
