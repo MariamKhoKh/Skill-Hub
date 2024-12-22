@@ -18,7 +18,7 @@ class TeacherProfile(models.Model):
     bio = models.TextField(null=True, blank=True)
     skills = models.ManyToManyField(Skill, blank=True)
     hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, default=0.0)
-    communication_methods = models.TextField(help_text="Comma-separated list of skills")
+    communication_methods = models.JSONField(default=list, blank=True)
     experience_years = models.PositiveIntegerField(default=0)
     rating = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])
     total_reviews = models.PositiveIntegerField(default=0)
@@ -26,6 +26,9 @@ class TeacherProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def get_communication_methods_display(self):
+        return ', '.join(self.communication_methods)
 
 
 class TeacherSkill(models.Model):

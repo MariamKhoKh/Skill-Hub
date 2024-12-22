@@ -89,11 +89,25 @@ def teacher_profile_edit(request):
 
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
-        profile_form = TeacherProfileForm(request.POST, instance=teacher_profile)
+        profile_form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            profile_form.save()
+            profile = profile_form.save(commit=False)
+
+            # Process new skills
+            new_skills_text = request.POST.get('new_skills', '')
+            if new_skills_text:
+                skill_names = [name.strip() for name in new_skills_text.split(',')]
+                for skill_name in skill_names:
+                    if skill_name:  # Only process non-empty skills
+                        skill, _ = Skill.objects.get_or_create(name=skill_name)
+                        profile.skills.add(skill)
+
+            # Save the profile and many-to-many relationships
+            profile.save()
+            profile_form.save_m2m()
+
             messages.success(request, 'Profile updated successfully!')
             return redirect('teacher_profile', teacher_id=teacher_profile.id)
     else:
@@ -142,7 +156,6 @@ def search_teachers(request):
         teachers = TeacherProfile.objects.none()
 
     return render(request, 'teaching/search_results.html', {'teachers': teachers, 'query': query})
-
 
 
 def featured_teachers_view(request):

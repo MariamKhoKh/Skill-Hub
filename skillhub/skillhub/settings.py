@@ -161,3 +161,4 @@ EMAIL_HOST_PASSWORD = 'zwtqcdpikkpmsjxn'
 
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

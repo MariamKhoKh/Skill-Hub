@@ -9,21 +9,22 @@
 <div class="mb-3">
     <h5 class="text-light">Skills</h5>
     <div class="d-flex flex-wrap">
-
-        <span class="skill-badge">{{ skill }}</span>
-
+        {% for skill in teacher_profile.skills.all %}
+            <span class="skill-badge">{{ skill.name }}</span>
+        {% endfor %}
     </div>
 </div>
 
 <div class="mb-3">
     <h5 class="text-light">Details</h5>
     <p><i class="fas fa-clock me-2"></i>Experience: {{ teacher_profile.experience_years }} years</p>
-    <p><i class="fas fa-video me-2"></i>Dialogue: {{ communication_methods|join:", " }}</p>
+    <p><i class="fas fa-video me-2"></i>Dialogue: {{ teacher_profile.communication_methods|join:", " }}</p>
     <p><i class="fas fa-calendar-alt me-2"></i>Join Date: {{ teacher_profile.join_date|date:"M Y" }}</p>
     <p><i class="fas fa-dollar-sign me-2"></i>Hour Rate: ${{ teacher_profile.hourly_rate }}</p>
 </div>
 
 <div class="mb-3">
     <h5 class="text-light">Bio</h5>
-    <p>{{ user.bio }}</p>
+    <p>{{ teacher_profile.bio }}</p> <!-- Changed from user.bio to teacher_profile.bio -->
 </div>
+

@@ -1,9 +1,35 @@
 from django import forms
-from .models import TeacherProfile, TeacherSkill, Review, Student
+from .models import TeacherProfile, TeacherSkill, Review, Student, Skill
 from users.models import User
 
 
 class TeacherProfileForm(forms.ModelForm):
+    new_skills = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter new skills, separated by commas'
+        })
+    )
+
+    communication_methods = forms.MultipleChoiceField(
+        choices=[
+            ('teams', 'Microsoft Teams'),
+            ('zoom', 'Zoom'),
+            ('skype', 'Skype'),
+            ('discord', 'Discord'),
+            ('other', 'Other')
+        ],
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'communication-checkbox'}),
+        required=False
+    )
+
+    skills = forms.ModelMultipleChoiceField(
+        queryset=Skill.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'skills-checkbox'}),
+        required=False
+    )
+
     def clean_hourly_rate(self):
         rate = self.cleaned_data['hourly_rate']
         if rate < 0:
