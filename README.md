@@ -33,7 +33,7 @@ SkillHub is an online platform where students can book sessions with teachers, l
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/SkillHub.git
+   git clone https://github.com/MariamKhoKh/Skill-Hub.git
    cd SkillHub
    ```
 
