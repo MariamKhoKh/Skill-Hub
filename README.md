@@ -88,12 +88,32 @@ SkillHub is an online platform where students can book sessions with teachers, l
 - `components/`: Reusable HTML components (e.g., booking form, teacher info).
 - `tasks.py`: Celery tasks for notifications and email sending.
 
-## Key Endpoints
+## Endpoints
 
-- `/profile_teacher/<teacher_id>/`: Teacher's profile page.
-- `/book_session/<teacher_id>/`: Book a session with a teacher.
-- `/respond_to_booking/<booking_id>/`: Accept or reject a booking.
-- `/notifications/`: Fetch unread notifications.
+### 1. **Retrieve a Single Teacher Profile**
+
+- **URL:** `/teaching/api/teachers/<id>/`
+- **Method:** `GET`
+- **Description:** Retrieves the details of a teacher profile by its ID.
+
+### 2. **Search Teachers by Skill**
+
+- **example URL request:** `/teaching/api/teachers/search/?skill=Python`
+- **Method:** `GET`
+- **Description:** Search for teachers who have a specific skill.
+
+
+### 3. **Retrieve Teachers with High Ratings**
+
+- **URL:** `/teaching/api/teachers/high-rated/`
+- **Method:** `GET`
+- **Description:** Retrieves a list of teachers filtered by a minimum rating.
+- **Query Parameters:**
+  - `min_rating` (optional): Minimum rating threshold (e.g., `4.5`).
+
+## Caching
+- To enhance performance, caching is implemented for the teacher's profile view using Django's cache_page decorator.
+- duration - 15 mins
 
 ## Additional Notes
 
