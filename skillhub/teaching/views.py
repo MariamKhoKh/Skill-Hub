@@ -18,56 +18,6 @@ from .serializers import TeacherProfileSerializer
 from rest_framework.generics import ListAPIView
 
 
-# @login_required
-# def teacher_dashboard(request):
-#     if request.user.role != 'teacher':
-#         messages.error(request, 'Access denied. Teacher privileges required.')
-#         return redirect('dashboard')
-#
-#     teacher_profile = TeacherProfile.objects.get_or_create(user=request.user)[0]
-#
-#
-#     bookings = Booking.objects.filter(
-#         teacher=teacher_profile
-#     ).order_by('-created_at')
-#
-#     teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
-#     teacher_skills = TeacherSkill.objects.filter(teacher_profile=teacher_profile)
-#     reviews = Review.objects.filter(teacher_profile=teacher_profile)
-#
-#     context = {
-#         'teacher_profile': teacher_profile,
-#         'teacher_skills': teacher_skills,
-#         'reviews': reviews,
-#         'featured_teachers': teachers,
-#         'total_teachers': teachers.count(),
-#         'bookings': bookings  # Add bookings to context
-#     }
-#     return render(request, 'teaching/dash_teacher.html', context)
-#
-#
-# @login_required
-# def student_dashboard(request):
-#     if request.user.role != 'student':
-#         messages.error(request, 'Access denied. Student privileges required.')
-#         return redirect('dashboard')
-#
-#     # Get student's bookings
-#     bookings = Booking.objects.filter(
-#         student=request.user
-#     ).select_related('teacher__user').order_by('-created_at')
-#
-#     # Count pending bookings
-#     pending_bookings = bookings.filter(status='PENDING').count()
-#
-#     context = {
-#         'bookings': bookings,
-#         'pending_bookings': pending_bookings,
-#         'total_teachers': TeacherProfile.objects.count(),
-#         'featured_teachers': TeacherProfile.objects.select_related('user').all()[:4]
-#     }
-#     return render(request, 'teaching/dash_student.html', context)
-
 @login_required
 def teacher_dashboard(request):
     if request.user.role != 'teacher':
