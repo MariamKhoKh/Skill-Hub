@@ -1,9 +1,9 @@
 # SkillHub
 
-SkillHub is an online platform where students can find tutors with specific skills,
-book sessions with teachers, 
-send and receive notifications,
-leave reviews, update profile info and manage learning activities efficiently.
+SkillHub is an online platform that connects 
+students with skilled tutors, enabling them to book sessions,
+send and receive notifications, leave reviews,
+and manage their learning activities efficiently.
 
 ## Features
 
