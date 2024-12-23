@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import TeacherProfileSerializer
 from rest_framework.generics import ListAPIView
+from django.core.exceptions import PermissionDenied
 
 
 @login_required
