@@ -1,6 +1,9 @@
 # SkillHub
 
-SkillHub is an online platform where students can book sessions with teachers, leave reviews, and manage learning activities efficiently.
+SkillHub is an online platform where students can find tutors with specific skills,
+book sessions with teachers, 
+send and receive notifications,
+leave reviews, update profile info and manage learning activities efficiently.
 
 ## Features
 
@@ -10,22 +13,28 @@ SkillHub is an online platform where students can book sessions with teachers, l
 
 2. **Booking System**
    - Students can request sessions with teachers.
-   - Teachers can accept or reject bookings directly from the notifications.
+   - Teachers can accept or reject bookings(also, send small explanation for canceling).
 
 3. **Notifications**
    - Teachers and students are notified about booking statuses in real-time.
 
-4. **Search Functionality**
-   - Students can search for teachers by name or skill.
+4. **Reviews**
+   - Students can leave comment and rate teacher out of 5 stars on the teacher's profile page
 
-5. **Dashboard**
+5. **Search Functionality**
+   - Searches for teachers by username or skill.
+   
+6. **Filtering**
+   - Filters teachers with experience, meeting platform, hourly rate
+
+7. **Dashboard(partially done)**
    - Teachers can view their total students, active courses, pending assignments, and upcoming classes.
 
 ## Technologies Used
 
 - **Backend**: Django, Celery
-- **Frontend**: HTML, CSS, JavaScript
-- **Database**: PostgreSQL (or any preferred relational database)
+- **Frontend**: HTML, CSS, SCSS, JavaScript
+- **Database**: SQLite
 - **Task Queue**: Redis (for Celery)
 - **Email Notifications**: Django's Email backend
 
@@ -74,19 +83,6 @@ SkillHub is an online platform where students can book sessions with teachers, l
    redis-server
    ```
 
-## Usage
-
-1. Navigate to `http://127.0.0.1:8000` in your browser.
-2. Log in as the superuser to access the admin panel or create teacher and student accounts.
-3. Test the booking functionality by logging in as a student and booking a session with a teacher.
-
-## Project Structure
-
-- `skillhub/`: Main Django app.
-- `templates/`: HTML templates.
-- `static/js/`: JavaScript files (e.g., `notifications.js`).
-- `components/`: Reusable HTML components (e.g., booking form, teacher info).
-- `tasks.py`: Celery tasks for notifications and email sending.
 
 ## Endpoints
 
@@ -119,15 +115,9 @@ SkillHub is an online platform where students can book sessions with teachers, l
 
 - Ensure Redis is installed and running for Celery tasks.
 - Configure email settings in `settings.py` for email notifications.
+- password of all existing accounts is "arvici123"
 
 ## to-do
-
-- caching
-- apis
-- filtering
-- update db
-- upload
-
----
+...
 
 
