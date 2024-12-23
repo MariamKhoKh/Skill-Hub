@@ -74,10 +74,17 @@ def notifications_view(request):
         recipient=request.user,
         is_read=False
     ).order_by('-timestamp')
-    return JsonResponse({
-        'notifications': list(notifications.values('id', 'title', 'message', 'timestamp'))
-    })
 
+    notifications_data = [{
+        'id': notification.id,
+        'title': notification.title,
+        'message': notification.message,
+        'timestamp': notification.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    } for notification in notifications]
+
+    return JsonResponse({
+        'notifications': notifications_data
+    })
 
 # @login_required
 # def get_notifications(request):

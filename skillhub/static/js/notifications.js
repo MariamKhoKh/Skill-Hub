@@ -24,7 +24,7 @@ function updateNotificationBadge(count) {
 }
 
 function fetchNotifications() {
-    fetch('/notifications/', {
+    fetch('/booking/notifications/', {
         headers: {
             'X-CSRFToken': getCSRFToken(),
         },
@@ -62,7 +62,7 @@ function fetchNotifications() {
 }
 
 function markNotificationAsRead(notificationId) {
-    fetch(`/notifications/${notificationId}/read/`, {
+    fetch(`/booking/notifications/mark/${notificationId}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCSRFToken(),
