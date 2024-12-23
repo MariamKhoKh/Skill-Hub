@@ -29,6 +29,7 @@ leave reviews, update profile info and manage learning activities efficiently.
 
 7. **Dashboard(partially done)**
    - Teachers can view their total students, active courses, pending assignments, and upcoming classes.
+   - Students can view their total teachers, active courses, pending assignments, and upcoming classes.
 
 ## Technologies Used
 
