@@ -4,9 +4,40 @@ from .models import User,  Message
 
 
 class UserRegistrationForm(UserCreationForm):
-    username = forms.CharField(label='Username', widget=forms.TextInput())
-    email = forms.EmailField(required=True)
-    role = forms.ChoiceField(choices=User.ROLES)
+    username = forms.CharField(
+        label='Username',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your username'
+        })
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email'
+        })
+    )
+    role = forms.ChoiceField(
+        choices=User.ROLES,
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+    password1 = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your password'
+        })
+    )
+    password2 = forms.CharField(
+        label='Confirm Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirm your password'
+        })
+    )
 
     class Meta:
         model = User
