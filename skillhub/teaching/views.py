@@ -11,6 +11,11 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from .models import TeacherProfile, Review
 from bookings.models import Booking
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import TeacherProfileSerializer
+from rest_framework.generics import ListAPIView
 
 
 @login_required
@@ -187,4 +192,84 @@ def add_review(request, teacher_id):
         messages.success(request, 'Review added successfully!')
         return redirect('teacher_profile', teacher_id=teacher.id)
 
+
+def dashboard(request):
+    teachers_query = TeacherProfile.objects.all()
+
+    experience = request.GET.get('experience')
+    platforms = request.GET.getlist('platforms')
+    rate = request.GET.get('rate')
+
+    if experience:
+        if experience == '1-3':
+            teachers_query = teachers_query.filter(experience_years__gte=1, experience_years__lte=3)
+        elif experience == '4-6':
+            teachers_query = teachers_query.filter(experience_years__gte=4, experience_years__lte=6)
+        elif experience == '7+':
+            teachers_query = teachers_query.filter(experience_years__gte=7)
+
+    if platforms:
+        for platform in platforms:
+            teachers_query = teachers_query.filter(communication_methods__icontains=platform)
+
+    if rate:
+        try:
+            rate_value = float(rate)
+            teachers_query = teachers_query.filter(hourly_rate__lte=rate_value)
+        except ValueError:
+            pass
+
+    context = {
+        'featured_teachers': teachers_query,
+        'total_teachers': teachers_query.count(),
+    }
+
+    return render(request, 'dash_teacher.html', context)
+
+
+class TeacherProfileView(APIView):
+    def get(self, request, pk):
+        teacher = TeacherProfile.objects.get(pk=pk)
+        serializer = TeacherProfileSerializer(teacher)
+        return Response(serializer.data)
+
+
+class TeacherListView(ListAPIView):
+    """
+    View to list all teachers or filter them by skill.
+    """
+    queryset = TeacherProfile.objects.all()
+    serializer_class = TeacherProfileSerializer
+
+    def get_queryset(self):
+        """
+        Override to filter teachers by skill if 'skill' parameter is provided.
+        """
+        queryset = super().get_queryset()
+        skill = self.request.query_params.get('skill', None)
+        if skill:
+            queryset = queryset.filter(skills__name__icontains=skill)
+        return queryset
+
+
+class HighRatedTeachersView(ListAPIView):
+    """
+    View to list teachers with a minimum rating.
+    """
+    queryset = TeacherProfile.objects.all()
+    serializer_class = TeacherProfileSerializer
+
+    def get_queryset(self):
+        """
+        Override to filter teachers by rating if 'min_rating' parameter is provided.
+        """
+        queryset = super().get_queryset()
+        min_rating = self.request.query_params.get('min_rating', None)
+        if min_rating:
+            try:
+                min_rating = float(min_rating)
+                queryset = queryset.filter(rating__gte=min_rating)
+            except ValueError:
+                pass
+        return queryset
 
