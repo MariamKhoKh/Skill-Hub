@@ -11,10 +11,10 @@
                     <div class="col-sm-6 col-xl-3">
                         <div class="bg-dark rounded p-4 h-100">
                             <div class="text-center mb-3">
-                                {% if teacher.profile_image %}
+                                {% if teacher.profile_picture %}
                                     <img class="rounded-circle" src="{{ teacher.profile_picture.url }}" alt="Teacher Image" style="width: 80px; height: 80px;">
                                 {% else %}
-                                    <img class="rounded-circle" src="{% static 'images/default-profile.jpg' %}" alt="Default" style="width: 80px; height: 80px;">
+                                    <img class="rounded-circle" src="{% static 'img/img.png' %}" alt="Default" style="width: 80px; height: 80px;">
                                 {% endif %}
                             </div>
                             <h5 class="text-center text-primary mb-2">

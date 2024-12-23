@@ -8,6 +8,7 @@ from .forms import UserRegistrationForm, UserLoginForm, UserUpdateForm
 from .models import User, Message, Notification
 from teaching.models import TeacherProfile
 from django.db.models import Avg
+from django.views.decorators.cache import cache_page
 
 
 def register(request):
@@ -59,7 +60,7 @@ def dashboard(request):
     elif request.user.role == 'teacher':
         return redirect('teacher_dashboard')
     else:
-        return redirect('login')  # Default fallback in case role is not defined
+        return redirect('login')
 
 
 @login_required
@@ -76,6 +77,7 @@ def profile_student(request):
 
 
 @login_required
+@cache_page(60 * 15)
 def profile_teacher(request):
     teacher = TeacherProfile.objects.get(user=request.user)
     reviews = teacher.reviews.all().order_by('-created_at')  # Assuming a `Review` model with a `created_at` field
@@ -104,6 +106,9 @@ def navbar_data(request):
     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')[:5]
     notifications = Notification.objects.filter(user=request.user).order_by('-timestamp')[:5]
     return {'messages': messages, 'notifications': notifications}
+
+
+
 
 
 

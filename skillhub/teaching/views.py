@@ -18,6 +18,56 @@ from .serializers import TeacherProfileSerializer
 from rest_framework.generics import ListAPIView
 
 
+# @login_required
+# def teacher_dashboard(request):
+#     if request.user.role != 'teacher':
+#         messages.error(request, 'Access denied. Teacher privileges required.')
+#         return redirect('dashboard')
+#
+#     teacher_profile = TeacherProfile.objects.get_or_create(user=request.user)[0]
+#
+#
+#     bookings = Booking.objects.filter(
+#         teacher=teacher_profile
+#     ).order_by('-created_at')
+#
+#     teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
+#     teacher_skills = TeacherSkill.objects.filter(teacher_profile=teacher_profile)
+#     reviews = Review.objects.filter(teacher_profile=teacher_profile)
+#
+#     context = {
+#         'teacher_profile': teacher_profile,
+#         'teacher_skills': teacher_skills,
+#         'reviews': reviews,
+#         'featured_teachers': teachers,
+#         'total_teachers': teachers.count(),
+#         'bookings': bookings  # Add bookings to context
+#     }
+#     return render(request, 'teaching/dash_teacher.html', context)
+#
+#
+# @login_required
+# def student_dashboard(request):
+#     if request.user.role != 'student':
+#         messages.error(request, 'Access denied. Student privileges required.')
+#         return redirect('dashboard')
+#
+#     # Get student's bookings
+#     bookings = Booking.objects.filter(
+#         student=request.user
+#     ).select_related('teacher__user').order_by('-created_at')
+#
+#     # Count pending bookings
+#     pending_bookings = bookings.filter(status='PENDING').count()
+#
+#     context = {
+#         'bookings': bookings,
+#         'pending_bookings': pending_bookings,
+#         'total_teachers': TeacherProfile.objects.count(),
+#         'featured_teachers': TeacherProfile.objects.select_related('user').all()[:4]
+#     }
+#     return render(request, 'teaching/dash_student.html', context)
+
 @login_required
 def teacher_dashboard(request):
     if request.user.role != 'teacher':
@@ -25,13 +75,13 @@ def teacher_dashboard(request):
         return redirect('dashboard')
 
     teacher_profile = TeacherProfile.objects.get_or_create(user=request.user)[0]
-
-
     bookings = Booking.objects.filter(
         teacher=teacher_profile
     ).order_by('-created_at')
 
     teachers = TeacherProfile.objects.select_related('user').prefetch_related('skills').all()
+    teachers = filter_teachers(request, teachers)  # Apply filtering
+
     teacher_skills = TeacherSkill.objects.filter(teacher_profile=teacher_profile)
     reviews = Review.objects.filter(teacher_profile=teacher_profile)
 
@@ -41,7 +91,7 @@ def teacher_dashboard(request):
         'reviews': reviews,
         'featured_teachers': teachers,
         'total_teachers': teachers.count(),
-        'bookings': bookings  # Add bookings to context
+        'bookings': bookings
     }
     return render(request, 'teaching/dash_teacher.html', context)
 
@@ -52,19 +102,20 @@ def student_dashboard(request):
         messages.error(request, 'Access denied. Student privileges required.')
         return redirect('dashboard')
 
-    # Get student's bookings
     bookings = Booking.objects.filter(
         student=request.user
     ).select_related('teacher__user').order_by('-created_at')
 
-    # Count pending bookings
     pending_bookings = bookings.filter(status='PENDING').count()
+
+    teachers = TeacherProfile.objects.select_related('user').all()
+    teachers = filter_teachers(request, teachers)  # Apply filtering
 
     context = {
         'bookings': bookings,
         'pending_bookings': pending_bookings,
-        'total_teachers': TeacherProfile.objects.count(),
-        'featured_teachers': TeacherProfile.objects.select_related('user').all()[:4]
+        'total_teachers': teachers.count(),
+        'featured_teachers': teachers[:4]
     }
     return render(request, 'teaching/dash_student.html', context)
 
@@ -193,38 +244,16 @@ def add_review(request, teacher_id):
         return redirect('teacher_profile', teacher_id=teacher.id)
 
 
-def dashboard(request):
+def dash(request):
     teachers_query = TeacherProfile.objects.all()
-
-    experience = request.GET.get('experience')
-    platforms = request.GET.getlist('platforms')
-    rate = request.GET.get('rate')
-
-    if experience:
-        if experience == '1-3':
-            teachers_query = teachers_query.filter(experience_years__gte=1, experience_years__lte=3)
-        elif experience == '4-6':
-            teachers_query = teachers_query.filter(experience_years__gte=4, experience_years__lte=6)
-        elif experience == '7+':
-            teachers_query = teachers_query.filter(experience_years__gte=7)
-
-    if platforms:
-        for platform in platforms:
-            teachers_query = teachers_query.filter(communication_methods__icontains=platform)
-
-    if rate:
-        try:
-            rate_value = float(rate)
-            teachers_query = teachers_query.filter(hourly_rate__lte=rate_value)
-        except ValueError:
-            pass
+    teachers_query = filter_teachers(request, teachers_query)
 
     context = {
         'featured_teachers': teachers_query,
         'total_teachers': teachers_query.count(),
     }
 
-    return render(request, 'dash_teacher.html', context)
+    return render(request, 'teaching/dash_teacher.html', context)
 
 
 class TeacherProfileView(APIView):
@@ -270,6 +299,35 @@ class HighRatedTeachersView(ListAPIView):
                 min_rating = float(min_rating)
                 queryset = queryset.filter(rating__gte=min_rating)
             except ValueError:
-                pass
+                pass  # Ignore invalid values
         return queryset
+
+
+def filter_teachers(request, teachers_query):
+    experience = request.GET.get('experience')
+    platforms = request.GET.getlist('platforms')
+    rate = request.GET.get('rate')
+
+    if experience:
+        if experience == '1-3':
+            teachers_query = teachers_query.filter(experience_years__gte=1, experience_years__lte=3)
+        elif experience == '4-6':
+            teachers_query = teachers_query.filter(experience_years__gte=4, experience_years__lte=6)
+        elif experience == '7+':
+            teachers_query = teachers_query.filter(experience_years__gte=7)
+
+    if platforms:
+        for platform in platforms:
+            teachers_query = teachers_query.filter(communication_methods__icontains=platform)
+
+    if rate:
+        try:
+            rate_value = float(rate)
+            teachers_query = teachers_query.filter(hourly_rate__lte=rate_value)
+        except ValueError:
+            pass
+
+    return teachers_query
+
+
 

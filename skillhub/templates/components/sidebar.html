@@ -34,13 +34,16 @@
                         <input class="form-check-input" type="checkbox" value="teams" id="teams">
                         <label class="form-check-label text-light" for="teams">Teams</label>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="skype" id="skype">
+                        <label class="form-check-label text-light" for="skype">Skype</label>
+                    </div>
                 </div>
-
                 <!-- Hourly Rate Filter -->
                 <div class="mb-3">
                     <label class="form-label text-light">Hourly Rate</label>
                     <div class="d-flex align-items-center">
-                        <input type="range" class="form-range" min="20" max="200" id="rateRange" oninput="updateRateValue(this.value)">
+                        <input type="range" class="form-range" min="0" max="100" id="rateRange" oninput="updateRateValue(this.value)">
                     </div>
                     <div class="text-light"><span id="rateValue">$20</span>/hour</div>
                 </div>
@@ -49,6 +52,9 @@
                 <div class="d-grid">
                     <button class="btn btn-primary" id="applyFilters" onclick="applyFilters()">Apply</button>
                 </div>
+                <div class="d-grid mt-2">
+                    <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -56,23 +62,95 @@
 <!-- Sidebar End -->
 
 <script>
-    function updateRateValue(value) {
-        document.getElementById('rateValue').textContent = `$${value}`;
+function applyFilters() {
+    const experience = document.getElementById('experienceFilter').value;
+    const platforms = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+    const hourlyRate = document.getElementById('rateRange').value;
+
+    console.log('Filters applied:', { experience, platforms, hourlyRate }); // Debug log
+
+    const params = new URLSearchParams();
+
+    // Add experience filter
+    if (experience) {
+        params.append('experience', experience);
     }
 
-    function applyFilters() {
-        const experience = document.getElementById('experienceFilter').value;
-        const platforms = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-        const hourlyRate = document.getElementById('rateRange').value;
+    // Add platform filters
+    platforms.forEach(platform => {
+        params.append('platforms', platform);
+    });
 
-        // Implement your filter logic here. Example: send data to the backend or filter results dynamically.
-        console.log({
-            experience,
-            platforms,
-            hourlyRate
-        });
-
-        // Example: trigger a reload or AJAX request with filter parameters
-        // window.location.href = `/filtered-results?experience=${experience}&platforms=${platforms.join(',')}&rate=${hourlyRate}`;
+    // Add hourly rate filter
+    if (hourlyRate) {
+        params.append('rate', hourlyRate);
     }
+
+    // Preserve any other existing query parameters
+    const currentParams = new URLSearchParams(window.location.search);
+    for (let [key, value] of currentParams.entries()) {
+        if (!['experience', 'platforms', 'rate'].includes(key)) {
+            params.append(key, value);
+        }
+    }
+
+    // Redirect with updated query parameters
+    window.location.href = `${window.location.pathname}?${params.toString()}`;
+}
+
+// Function to initialize filters from the URL on page load
+function initializeFilters() {
+    const params = new URLSearchParams(window.location.search);
+
+    // Initialize experience filter
+    const experience = params.get('experience');
+    if (experience) {
+        document.getElementById('experienceFilter').value = experience;
+    }
+
+    // Initialize platform checkboxes
+    const platforms = params.getAll('platforms');
+    platforms.forEach(platform => {
+        const checkbox = document.getElementById(platform);
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+    });
+
+    // Initialize hourly rate filter
+    const rate = params.get('rate');
+    const rateRange = document.getElementById('rateRange');
+    if (rate) {
+        rateRange.value = rate; // Set to the value from the URL
+        updateRateValue(rate); // Update displayed value
+    } else {
+        rateRange.value = rateRange.min; // Default to the minimum value
+        updateRateValue(rateRange.min); // Update displayed value
+    }
+}
+
+// Function to dynamically update the displayed hourly rate value
+function updateRateValue(value) {
+    document.getElementById('rateValue').textContent = `$${value}`;
+}
+
+// Function to reset all filters to their default states
+function resetFilters() {
+    // Reset experience filter
+    document.getElementById('experienceFilter').value = '';
+
+    // Uncheck all platform checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+    // Reset hourly rate slider to minimum value
+    const rateRange = document.getElementById('rateRange');
+    rateRange.value = rateRange.min;
+    updateRateValue(rateRange.min);
+
+    // Redirect to the page without query parameters
+    window.location.href = window.location.pathname;
+}
+
+// Attach event listeners when the document is fully loaded
+document.addEventListener('DOMContentLoaded', initializeFilters);
 </script>

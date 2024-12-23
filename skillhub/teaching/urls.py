@@ -13,6 +13,6 @@ urlpatterns = [
     path('add-review/<int:teacher_id>/', views.add_review, name='add_review'),
     path('api/teachers/', TeacherListView.as_view(), name='teachers_list'),
     path('api/teachers/<int:pk>/', TeacherProfileView.as_view(), name='teacher_profile_api'),
-    path('api/teachers/high-rated/', HighRatedTeachersView.as_view(), name='high_rated_teachers'),  # New route
+    path('api/teachers/high-rated/', HighRatedTeachersView.as_view(), name='high_rated_teachers'),
 
 ]
